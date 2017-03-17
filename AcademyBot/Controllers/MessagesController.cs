@@ -46,11 +46,13 @@ namespace AcademyBot
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 // calculate something for us to return
                 int length = (activity.Text ?? string.Empty).Length;
+                string username = activity.ToString();
+                string conf_name = activity.Conversation.Name;
                 string answer = GetAugur();
                 // return our reply to the user
                 //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                Activity reply = activity.CreateReply(answer);
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
+                await connector.Conversations.ReplyToActivityAsync(reply);                
             }
             else
             {
@@ -117,7 +119,7 @@ namespace AcademyBot
             string res_text = "";
             if (augur_result.status == 1)
             {
-                res_text = "Авгур каже: " + Environment.NewLine + augur_result.text + Environment.NewLine + " " + Environment.NewLine + books[rand].langs[0].author + " - \"" + books[rand].langs[0].name + "\"";
+                res_text = "авгур каже: " + Environment.NewLine + augur_result.text + Environment.NewLine + " " + Environment.NewLine + books[rand].langs[0].author + " - \"" + books[rand].langs[0].name + "\"";
             }
             else
             {

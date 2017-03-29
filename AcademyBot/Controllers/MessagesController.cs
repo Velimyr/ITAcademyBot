@@ -9,6 +9,9 @@ using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Web.Script.Serialization;
 using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Collections.Generic;
 
 namespace AcademyBot
 {
@@ -51,8 +54,50 @@ namespace AcademyBot
                 string answer = GetAugur();
                 // return our reply to the user
                 //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
-                await connector.Conversations.ReplyToActivityAsync(reply);                
+                //Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
+                //await connector.Conversations.ReplyToActivityAsync(reply);
+
+                //CardAction act = new CardAction();
+                //act.Type = "Hero";
+                //act.Title = "ttest";
+
+                try
+                {
+                    Activity replyToConversation = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
+                    replyToConversation.Recipient = activity.From;
+                    replyToConversation.Type = "message";
+                    replyToConversation.Attachments = new List<Attachment>();
+
+                    //List<CardImage> cardImages = new List<CardImage>();
+                    //cardImages.Add(new CardImage(url: "https://cdn-images-1.medium.com/fit/c/100/100/1*bGkCjp_g5jw8KYF7y71qPQ.png"));
+
+                    List<CardAction> cardButtons = new List<CardAction>();
+                    CardAction plButton = new CardAction()
+                    {
+                        Value = "https://medium.com/@AugurBook",
+                        Type = "openUrl",
+                        Title = "Augur site"
+                    };
+                    cardButtons.Add(plButton);
+                    HeroCard HC = new HeroCard()
+                    {
+                        Title = "Відвідайте сайт авгура",                       
+                        //Text = answer,                     
+                       // Images = cardImages,
+                        Buttons = cardButtons
+
+                    };
+                    Attachment att = HC.ToAttachment();                 
+                   // Activity rep = activity.CreateReply();
+                    replyToConversation.Attachments.Add(att);
+                   // var reply = await connector.Conversations.SendToConversationAsync(replyToConversation);
+                    await connector.Conversations.ReplyToActivityAsync(replyToConversation);
+                }
+                catch (Exception err)
+                {
+
+                }
+               
             }
             else
             {
@@ -68,17 +113,24 @@ namespace AcademyBot
             {
                 // Implement user deletion here
                 // If we handle user deletion, return a real message
+               
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
                 // Handle conversation state changes, like members being added and removed
                 // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
                 // Not available in all channels
+
+                ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                Activity reply = message.CreateReply("Для того щоб отримати пророцтво напишіть ваше питання");
+                
+                connector.Conversations.ReplyToActivityAsync(reply);
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {
                 // Handle add/remove from contact lists
                 // Activity.From + Activity.Action represent what happened
+               
             }
             else if (message.Type == ActivityTypes.Typing)
             {
@@ -86,6 +138,7 @@ namespace AcademyBot
             }
             else if (message.Type == ActivityTypes.Ping)
             {
+               
             }
 
             return null;
@@ -119,7 +172,7 @@ namespace AcademyBot
             string res_text = "";
             if (augur_result.status == 1)
             {
-                res_text = "авгур каже: " + Environment.NewLine + augur_result.text + Environment.NewLine + " " + Environment.NewLine + books[rand].langs[0].author + " - \"" + books[rand].langs[0].name + "\"";
+                res_text =  "авгур каже..." + Environment.NewLine + augur_result.text + Environment.NewLine + " " + Environment.NewLine + books[rand].langs[0].author + " - \"" + books[rand].langs[0].name + "\"";
             }
             else
             {
@@ -156,5 +209,7 @@ namespace AcademyBot
                 return null;
             }
         }
+
+       
     }
 }

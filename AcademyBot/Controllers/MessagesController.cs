@@ -53,9 +53,9 @@ namespace AcademyBot
                 string conf_name = activity.Conversation.Name;
                 string answer = GetAugur();
                 // return our reply to the user
-                //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters from {activity.ChannelId} chanel" );
                 //Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
-                //await connector.Conversations.ReplyToActivityAsync(reply);
+                await connector.Conversations.ReplyToActivityAsync(reply);
 
                 //CardAction act = new CardAction();
                 //act.Type = "Hero";
@@ -85,7 +85,6 @@ namespace AcademyBot
                         //Text = answer,                     
                        // Images = cardImages,
                         Buttons = cardButtons
-
                     };
                     Attachment att = HC.ToAttachment();                 
                    // Activity rep = activity.CreateReply();
@@ -120,11 +119,13 @@ namespace AcademyBot
                 // Handle conversation state changes, like members being added and removed
                 // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
                 // Not available in all channels
+                if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id))
+                {
+                    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                    Activity reply = message.CreateReply("Для того щоб отримати пророцтво напишіть ваше питання");
 
-                ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
-                Activity reply = message.CreateReply("Для того щоб отримати пророцтво напишіть ваше питання");
-                
-                connector.Conversations.ReplyToActivityAsync(reply);
+                    connector.Conversations.ReplyToActivityAsync(reply);
+                }
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {

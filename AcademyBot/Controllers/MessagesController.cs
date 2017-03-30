@@ -51,12 +51,13 @@ namespace AcademyBot
                 int length = (activity.Text ?? string.Empty).Length;
                 string username = activity.ToString();
                 string conf_name = activity.Conversation.Name;
-                string answer = GetAugur();
+                
                 // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters from {activity.ChannelId} chanel" );
-                //Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", " + answer);
+                //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters from {activity.ChannelId} chanel" );
+                Activity reply = activity.CreateReply(activity.From.Name.ToString() + ", зачекайте авгур пророкує ваше майбутнє");
                 await connector.Conversations.ReplyToActivityAsync(reply);
 
+                string answer = GetAugur();
                 //CardAction act = new CardAction();
                 //act.Type = "Hero";
                 //act.Title = "ttest";
